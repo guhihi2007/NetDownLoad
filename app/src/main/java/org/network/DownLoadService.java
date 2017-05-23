@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,7 +22,7 @@ public class DownLoadService extends Service {
 
     private HashMap<Integer, DownLoadTask> mDownLoadTask = new HashMap<>();
     private ExecutorService executors;
-    private LinkedBlockingQueue waitQeue = new LinkedBlockingQueue();
+    private LinkedBlockingQueue<DownLoadEntry> waitQeue = new LinkedBlockingQueue();
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -42,7 +43,7 @@ public class DownLoadService extends Service {
         DownLoadEntry e = (DownLoadEntry) waitQeue.poll();
         if (e != null)
             if (e.status == DownLoadEntry.DownloadStatus.waiting) {
-                start(e);
+                addTask(e);
             }
     }
 
@@ -71,8 +72,8 @@ public class DownLoadService extends Service {
             case Constants.DownLoadStart:
                 addTask(entry);
                 break;
-            case Constants.DownLoadStop:
-                stop(entry);
+            case Constants.DownLoadPause:
+                pause(entry);
                 break;
             case Constants.DownLoadDelete:
                 delete(entry);
@@ -80,7 +81,33 @@ public class DownLoadService extends Service {
             case Constants.DownLoadResume:
                 resume(entry);
                 break;
+            case Constants.PauseAll:
+                pauseAll();
+                break;
+            case Constants.RecoveruAll:
+                recoveryAll();
+                break;
         }
+    }
+
+    private void recoveryAll() {
+        ArrayList<DownLoadEntry> list = Watched.getInstance().getEntryList();
+        if (list != null)
+            for (DownLoadEntry e : list) {
+                addTask(e);
+            }
+    }
+
+    private void pauseAll() {
+        while (waitQeue.iterator().hasNext()) {
+            DownLoadEntry entry = waitQeue.poll();
+            entry.status = DownLoadEntry.DownloadStatus.paused;
+            Watched.getInstance().postState(entry);
+        }
+        for (HashMap.Entry<Integer, DownLoadTask> entry : mDownLoadTask.entrySet()) {
+            entry.getValue().pause();
+        }
+        mDownLoadTask.clear();
     }
 
     private void addTask(DownLoadEntry entry) {
@@ -100,10 +127,10 @@ public class DownLoadService extends Service {
         mDownLoadTask.put(entry.id, task);
     }
 
-    private void stop(DownLoadEntry entry) {
+    private void pause(DownLoadEntry entry) {
         DownLoadTask task = mDownLoadTask.remove(entry.id);
         if (task != null) {
-            task.stop();
+            task.pause();
         } else {
             waitQeue.remove(entry);
             entry.status = DownLoadEntry.DownloadStatus.paused;

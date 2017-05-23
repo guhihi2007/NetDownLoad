@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private DownLoadManager manager;
     private ArrayList<DownLoadEntry> arrayList = new ArrayList<>();
     private Adapter adapter;
+    private TextView pauseall;
     private Watcher watcher = new Watcher() {
         @Override
         public void dataUpdate(DownLoadEntry entry) {
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+    private TextView recovery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new Adapter(this, arrayList);
         recyclerView.setAdapter(adapter);
+        pauseall = (TextView) findViewById(R.id.pauseAll);
+        recovery = (TextView) findViewById(R.id.tv);
+        pauseall.setText("PauseAll");
+        recovery.setText("RecoveryAll");
+
+        pauseall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                manager.pauseAll();
+            }
+        });
+        recovery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                manager.recoveryAll();
+            }
+        });
     }
 
     class Adapter extends RecyclerView.Adapter<ViewHolder> {

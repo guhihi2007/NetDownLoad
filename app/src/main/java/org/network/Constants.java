@@ -11,9 +11,11 @@ public class Constants {
     public static final String DownLoadAction = "action";
 
     public static final int DownLoadStart = 1;
-    public static final int DownLoadStop = 2;
+    public static final int DownLoadPause = 2;
     public static final int DownLoadResume = 3;
     public static final int DownLoadDelete = 4;
 
     public static final int MAX_DOWNLOAD_TASK =2 ;
+    public static final int PauseAll=100;
+    public static  final int RecoveruAll=99;
 }

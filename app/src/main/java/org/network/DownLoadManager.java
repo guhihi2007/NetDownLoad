@@ -35,7 +35,7 @@ public class DownLoadManager {
         Intent intent = new Intent();
         intent.setClass(context, DownLoadService.class);
         intent.putExtra(Constants.DownLoadEntry, entry);
-        intent.putExtra(Constants.DownLoadAction, Constants.DownLoadStop);
+        intent.putExtra(Constants.DownLoadAction, Constants.DownLoadPause);
         context.startService(intent);
     }
 
@@ -61,5 +61,19 @@ public class DownLoadManager {
 
     public void removeObserver(Watcher watcher) {
         Watched.getInstance().deleteObserver(watcher);
+    }
+
+    public void pauseAll() {
+        Intent intent = new Intent();
+        intent.setClass(context, DownLoadService.class);
+        intent.putExtra(Constants.DownLoadAction, Constants.PauseAll);
+        context.startService(intent);
+    }
+
+    public void recoveryAll() {
+        Intent intent = new Intent();
+        intent.setClass(context, DownLoadService.class);
+        intent.putExtra(Constants.DownLoadAction, Constants.RecoveruAll);
+        context.startService(intent);
     }
 }

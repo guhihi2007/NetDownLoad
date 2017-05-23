@@ -10,8 +10,8 @@ import android.os.Message;
 public class DownLoadTask implements Runnable {
 
     private final DownLoadEntry entry;
-    private boolean isStop;
-    private boolean isDelete;
+    private volatile boolean isStop;
+    private volatile boolean isDelete;
     private Handler handler;
 
     public DownLoadTask(DownLoadEntry entry, Handler handler) {
@@ -53,16 +53,12 @@ public class DownLoadTask implements Runnable {
         handler.sendMessage(message);
     }
 
-    public void stop() {
+    public void pause() {
         isStop = true;
-//        entry.setStatus(DownLoadEntry.DownloadStatus.paused);
-//        Watched.getInstance().postState(entry);
     }
 
     public void delete() {
         isDelete = true;
-        entry.setStatus(DownLoadEntry.DownloadStatus.downloadiedl);
-        Watched.getInstance().postState(entry);
     }
 
     @Override
