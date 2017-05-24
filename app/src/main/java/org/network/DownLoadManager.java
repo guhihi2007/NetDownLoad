@@ -3,6 +3,8 @@ package org.network;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.ArrayList;
+
 /**
  * Created by Administrator on 2017/5/20.
  */
@@ -75,5 +77,9 @@ public class DownLoadManager {
         intent.setClass(context, DownLoadService.class);
         intent.putExtra(Constants.DownLoadAction, Constants.RecoveruAll);
         context.startService(intent);
+    }
+
+    public DownLoadEntry queryDownloadEntry(int id) {
+        return Watched.getInstance().queryDownloadEntries(id);
     }
 }

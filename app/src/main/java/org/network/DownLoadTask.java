@@ -20,10 +20,16 @@ public class DownLoadTask implements Runnable {
     }
 
     public void start() {
+        /**
+         * 启动ConnectThread，获取是否支持Rang，可以取消
+         *
+         * 支持用多线程
+         * 不支持用单线程
+         */
         entry.setStatus(DownLoadEntry.DownloadStatus.downloading);
 //        Watched.getInstance().postState(entry);
         setMsg(entry);
-        entry.totalLength = 1024 * 20;
+        entry.totalLength = 1024 * 50;
         for (int i = entry.getCurrentLength(); i < entry.getTotalLength(); ) {
             try {
                 Thread.sleep(1000);

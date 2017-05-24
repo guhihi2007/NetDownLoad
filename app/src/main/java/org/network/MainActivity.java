@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
                 arrayList.add(index, entry);
                 adapter.notifyDataSetChanged();
             }
-
         }
     };
     private TextView recovery;
@@ -38,8 +37,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        manager = DownLoadManager.getInstance(this);
+        manager = DownLoadManager.getInstance(this);//获取DownLoadManager时，会启动服务，但是服务启动的时间会比activity初始化会慢，可以在启动页时就初始化
+        initData();//每次onCreate拿到的不是最新的数据，所以在这里拿最新的数据状态
         findView();
+    }
+
+    private void initData() {
+        for (int i = 0; i < 10; i++) {
+            String url = "test" + i;
+            DownLoadEntry entry = new DownLoadEntry();
+            entry.setUrl(url);
+            entry.id = i;
+            arrayList.add(entry);
+        }
+        DownLoadEntry oldEntry = null;
+        DownLoadEntry newEntry = null;
+        for (int i = 0; i < arrayList.size(); i++) {
+            oldEntry = arrayList.get(i);
+            newEntry = manager.queryDownloadEntry(oldEntry.id);//不能直接操作被观察者，所以用manager来操作
+            if (newEntry != null) {
+                arrayList.remove(i);
+                arrayList.add(i, newEntry);
+            }
+        }
     }
 
     @Override
@@ -55,13 +75,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void findView() {
-        for (int i = 0; i < 10; i++) {
-            String url = "test" + i;
-            DownLoadEntry entry = new DownLoadEntry();
-            entry.setUrl(url);
-            entry.id = i;
-            arrayList.add(entry);
-        }
+
+
         recyclerView = (RecyclerView) findViewById(R.id.recycleview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new Adapter(this, arrayList);
@@ -70,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         recovery = (TextView) findViewById(R.id.tv);
         pauseall.setText("PauseAll");
         recovery.setText("RecoveryAll");
-
         pauseall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

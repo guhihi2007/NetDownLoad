@@ -40,7 +40,7 @@ public class DownLoadService extends Service {
     };
 
     private void startNext() {
-        DownLoadEntry e = (DownLoadEntry) waitQeue.poll();
+        DownLoadEntry e = waitQeue.poll();
         if (e != null)
             if (e.status == DownLoadEntry.DownloadStatus.waiting) {
                 addTask(e);
@@ -57,6 +57,20 @@ public class DownLoadService extends Service {
     public void onCreate() {
         super.onCreate();
         executors = Executors.newCachedThreadPool();
+        //服务第一次启动时，watched里面的map是空的，要在服务启动的时候给他数据，activity初始化就能获取到状态
+        //TODO 从数据库中拿出所有的数据
+        /*
+           ArrayList<DownloadEntry> list = DataBaseGetDownLoadEntry();
+           if(list != null)
+               for ( DownloadEntry entry:list ){
+                  if(entry.status==downloading||waiting){ //因为程序被强杀后所有状态都保存到数据库，再次拿出来的时候要判断，不然activity显示不一致
+                  entry.status=paused
+                  addTask（entry）
+                   // to do 或者可以在这里恢复，继续下载
+                  }
+                 Watched.getInstance.addMap(entry.id,entry);
+                }
+            * */
     }
 
     @Override
